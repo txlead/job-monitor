@@ -220,4 +220,3 @@ while True:
     check_jobs()
     print("💤 Жду 30 минут...")
     time.sleep(1800)
-```
