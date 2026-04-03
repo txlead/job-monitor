@@ -1,4 +1,3 @@
-cat > ~/job_monitor/job_monitor.py << 'ENDOFSCRIPT'
 import urllib.request
 import urllib.parse
 import json
@@ -8,22 +7,63 @@ TOKEN = "8615330828:AAE_aeIbY30MgXNk8JgQhfFAhFR7xHjdeKM"
 CHAT_ID = "737885020"
 
 SOURCES = [
+    # Крипто/Web3 - Greenhouse
     ("Alchemy", "https://boards-api.greenhouse.io/v1/boards/alchemy/jobs"),
     ("Uniswap", "https://boards-api.greenhouse.io/v1/boards/uniswap/jobs"),
     ("Optimism", "https://boards-api.greenhouse.io/v1/boards/optimism/jobs"),
     ("MagicEden", "https://boards-api.greenhouse.io/v1/boards/magiceden/jobs"),
     ("Messari", "https://boards-api.greenhouse.io/v1/boards/messari/jobs"),
-    ("Phantom", "https://boards-api.greenhouse.io/v1/boards/phantom/jobs"),
     ("Coinbase", "https://boards-api.greenhouse.io/v1/boards/coinbase/jobs"),
-    ("Figma", "https://boards-api.greenhouse.io/v1/boards/figma/jobs"),
-    ("Anthropic", "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs"),
     ("Ripple", "https://boards-api.greenhouse.io/v1/boards/ripple/jobs"),
+    ("Consensys", "https://boards-api.greenhouse.io/v1/boards/consensys/jobs"),
+    ("Dapper", "https://boards-api.greenhouse.io/v1/boards/dapperlabs/jobs"),
+    ("Anchorage", "https://boards-api.greenhouse.io/v1/boards/anchorage/jobs"),
+    # Крипто/Web3 - Lever
     ("Kraken", "https://api.lever.co/v0/postings/kraken"),
     ("Chainalysis", "https://api.lever.co/v0/postings/chainalysis"),
     ("Ledger", "https://api.lever.co/v0/postings/ledger"),
     ("Bitpanda", "https://api.lever.co/v0/postings/bitpanda"),
     ("Circle", "https://api.lever.co/v0/postings/circle"),
+    ("Fireblocks", "https://api.lever.co/v0/postings/fireblocks"),
+    ("Lido", "https://api.lever.co/v0/postings/lidofinance"),
+    # Fintech
+    ("Wise", "https://boards-api.greenhouse.io/v1/boards/wise/jobs"),
+    ("Brex", "https://boards-api.greenhouse.io/v1/boards/brex/jobs"),
+    ("Ramp", "https://boards-api.greenhouse.io/v1/boards/ramp/jobs"),
+    ("Mercury", "https://boards-api.greenhouse.io/v1/boards/mercury/jobs"),
+    ("Deel", "https://boards-api.greenhouse.io/v1/boards/deel/jobs"),
+    ("Stripe", "https://boards-api.greenhouse.io/v1/boards/stripe/jobs"),
     ("Monzo", "https://api.lever.co/v0/postings/monzo"),
+    ("Revolut", "https://api.lever.co/v0/postings/revolut"),
+    ("Klarna", "https://api.lever.co/v0/postings/klarna"),
+    # AI/Tech
+    ("Notion", "https://boards-api.greenhouse.io/v1/boards/notion/jobs"),
+    ("Linear", "https://boards-api.greenhouse.io/v1/boards/linear/jobs"),
+    ("Loom", "https://boards-api.greenhouse.io/v1/boards/loom/jobs"),
+    ("Webflow", "https://boards-api.greenhouse.io/v1/boards/webflow/jobs"),
+    ("Airtable", "https://boards-api.greenhouse.io/v1/boards/airtable/jobs"),
+    ("Anthropic", "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs"),
+    ("Runway", "https://boards-api.greenhouse.io/v1/boards/runwayml/jobs"),
+    ("Framer", "https://api.lever.co/v0/postings/framer"),
+    ("Pitch", "https://api.lever.co/v0/postings/pitch"),
+    # Стартапы YC/a16z
+    ("Retool", "https://boards-api.greenhouse.io/v1/boards/retool/jobs"),
+    ("Superhuman", "https://boards-api.greenhouse.io/v1/boards/superhuman/jobs"),
+    ("Coda", "https://boards-api.greenhouse.io/v1/boards/coda/jobs"),
+    ("Vercel", "https://api.lever.co/v0/postings/vercel"),
+    ("Planetscale", "https://api.lever.co/v0/postings/planetscale"),
+    ("Supabase", "https://api.lever.co/v0/postings/supabase"),
+    ("Resend", "https://api.lever.co/v0/postings/resend"),
+    # Design tools
+    ("Canva", "https://boards-api.greenhouse.io/v1/boards/canva/jobs"),
+    ("Figma", "https://boards-api.greenhouse.io/v1/boards/figma/jobs"),
+    ("Miro", "https://boards-api.greenhouse.io/v1/boards/miro/jobs"),
+    # Remote-first компании
+    ("Gitlab", "https://boards-api.greenhouse.io/v1/boards/gitlab/jobs"),
+    ("Zapier", "https://boards-api.greenhouse.io/v1/boards/zapier/jobs"),
+    ("Buffer", "https://api.lever.co/v0/postings/buffer"),
+    ("Doist", "https://api.lever.co/v0/postings/doist"),
+    ("Hotjar", "https://api.lever.co/v0/postings/hotjar"),
 ]
 
 ROLE_KEYWORDS = [
@@ -32,6 +72,7 @@ ROLE_KEYWORDS = [
     "digital designer", "brand identity", "art director",
     "senior designer", "mid designer", "product designer",
     "motion designer", "presentation designer", "creative lead",
+    "ux designer", "ui designer", "ux/ui", "ui/ux",
 ]
 
 LEVEL_BLOCK = ["junior", "intern", "entry level", "entry-level", "graduate"]
@@ -43,11 +84,6 @@ STOP_WORDS = [
     "no visa sponsorship", "must be located in us",
     "us only", "usa only", "hybrid", "on-site", "onsite",
     "must reside in", "must live in",
-]
-
-REMOTE_GOOD = [
-    "remote", "worldwide", "anywhere", "global",
-    "emea", "contractor", "distributed",
 ]
 
 seen_jobs = set()
@@ -64,99 +100,59 @@ def send_telegram(text):
     except Exception as e:
         print(f"Telegram error: {e}")
 
-def is_good_job(title, location, description=""):
+def is_good_job(title, location):
     title_low = title.lower()
     loc_low = location.lower()
-    desc_low = description.lower()
-    full = title_low + " " + loc_low + " " + desc_low
-
+    full = title_low + " " + loc_low
     if not any(k in title_low for k in ROLE_KEYWORDS):
-        return False, "роль не подходит"
-
+        return False
     if any(b in title_low for b in LEVEL_BLOCK):
-        return False, "junior/intern уровень"
-
+        return False
     if any(s in full for s in STOP_WORDS):
-        return False, "стоп-слово"
+        return False
+    return True
 
-    return True, "ок"
-
-def fetch_greenhouse(company, url):
-    results = []
+def fetch_greenhouse(url):
     with urllib.request.urlopen(url, timeout=10) as r:
         jobs = json.loads(r.read()).get("jobs", [])
-    for job in jobs:
-        results.append({
-            "id": str(job["id"]),
-            "title": job.get("title", ""),
-            "location": job.get("location", {}).get("name", "Remote"),
-            "link": job.get("absolute_url", ""),
-        })
-    return results
+    return [{"id": str(j["id"]), "title": j.get("title",""), "location": j.get("location",{}).get("name","Remote"), "link": j.get("absolute_url","")} for j in jobs]
 
-def fetch_lever(company, url):
-    results = []
+def fetch_lever(url):
     with urllib.request.urlopen(url, timeout=10) as r:
         jobs = json.loads(r.read())
-    for job in jobs:
-        results.append({
-            "id": str(job.get("id", "")),
-            "title": job.get("text", ""),
-            "location": job.get("categories", {}).get("location", "Remote"),
-            "link": job.get("hostedUrl", ""),
-        })
-    return results
+    return [{"id": str(j.get("id","")), "title": j.get("text",""), "location": j.get("categories",{}).get("location","Remote"), "link": j.get("hostedUrl","")} for j in jobs]
 
 def check_jobs():
     for company, url in SOURCES:
         try:
-            if "lever.co" in url:
-                jobs = fetch_lever(company, url)
-            else:
-                jobs = fetch_greenhouse(company, url)
-
-            new_count = 0
+            jobs = fetch_lever(url) if "lever.co" in url else fetch_greenhouse(url)
             for job in jobs:
                 jid = company + job["id"]
                 if jid in seen_jobs:
                     continue
                 seen_jobs.add(jid)
-
-                title = job["title"]
-                location = job["location"]
-                link = job["link"]
-
-                ok, reason = is_good_job(title, location)
-                if not ok:
+                if not is_good_job(job["title"], job["location"]):
                     continue
-
-                new_count += 1
-                msg = (
-                    f"🚀 <b>Новая вакансия!</b>\n\n"
-                    f"🏢 <b>{company}</b>\n"
-                    f"💼 {title}\n"
-                    f"📍 {location}\n"
-                    f"🔗 {link}\n\n"
-                    f"⚡️ Подавайся в первые 10 минут!"
-                )
+                msg = (f"🚀 <b>Новая вакансия!</b>\n\n"
+                       f"🏢 <b>{company}</b>\n"
+                       f"💼 {job['title']}\n"
+                       f"📍 {job['location']}\n"
+                       f"🔗 {job['link']}\n\n"
+                       f"⚡️ Подавайся в первые 10 минут!")
                 send_telegram(msg)
-                print(f"✅ {company}: {title}")
-
+                print(f"✅ {company}: {job['title']}")
         except Exception as e:
             print(f"⚠️ {company}: {e}")
 
-send_telegram(
-    "✅ <b>PandaJobHunt v3 запущен!</b>\n\n"
-    "📋 Мониторю 16 компаний каждые 30 минут\n"
-    "🎯 Фильтры: Brand/Graphic/Visual/Art Director\n"
-    "📍 Только Remote Worldwide\n"
-    "🚫 Без US Auth / Green Card / Hybrid\n"
-    "💰 Mid-Senior уровень"
-)
+send_telegram("✅ <b>PandaJobHunt v4 запущен!</b>\n\n📋 50 компаний | Крипто + Fintech + AI + Стартапы\n🎯 Brand/Graphic/Visual/UX Designer | Art Director\n📍 Remote Worldwide | 🚫 Без US Auth\n💰 От $60k")
 
 while True:
     print("\n🔍 Проверяю вакансии...")
     check_jobs()
     print("💤 Жду 30 минут...")
     time.sleep(1800)
-ENDOFSCRIPT
+```
+
+После вставки → **CMD+S** → в Terminal:
+```
+cd ~/job_monitor && git add . && git commit -m "v4 50 companies" && git push
