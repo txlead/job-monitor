@@ -26,16 +26,10 @@ SOURCES = [
     ("Ledger", "https://api.lever.co/v0/postings/ledger"),
     ("Revolut", "https://api.lever.co/v0/postings/revolut"),
     ("Klarna", "https://api.lever.co/v0/postings/klarna"),
-    ("Vercel", "https://api.lever.co/v0/postings/vercel"),
     ("Framer", "https://api.lever.co/v0/postings/framer"),
-    ("Monzo", "https://api.lever.co/v0/postings/monzo"),
     ("Chainalysis", "https://api.lever.co/v0/postings/chainalysis"),
     ("Circle", "https://api.lever.co/v0/postings/circle"),
     ("Fireblocks", "https://api.lever.co/v0/postings/fireblocks"),
-    ("Hotjar", "https://api.lever.co/v0/postings/hotjar"),
-    ("Doist", "https://api.lever.co/v0/postings/doist"),
-    ("Buffer", "https://api.lever.co/v0/postings/buffer"),
-    ("Bitpanda", "https://api.lever.co/v0/postings/bitpanda"),
 ]
 
 REMOTEOK_TAGS = ["brand-design", "graphic-design"]
@@ -66,11 +60,26 @@ STOP_WORDS = [
     "must be based in", "permanently authorized",
     "within the united states", "within the us",
     "within canada", "within the uk", "remote within",
+    "not contractor", "not a contractor",
+    "employees only", "full-time only",
+]
+
+GEO_RESTRICTED = [
+    "remote (us)", "remote (usa)", "remote (canada)",
+    "remote (uk)", "remote (australia)", "remote (germany)",
+    "remote (france)", "remote (spain)", "remote (brazil)",
+    "remote (argentina)", "remote (mexico)", "remote (india)",
+    "argentina remote", "brazil remote", "mexico remote",
+    "india remote", "us remote only", "canada remote only",
+    "remote, us", "remote, usa", "remote, canada",
+    "remote, uk", "remote, australia",
 ]
 
 REMOTE_OK_WORDS = [
-    "remote", "worldwide", "anywhere", "global",
-    "emea", "distributed", "americas",
+    "worldwide", "anywhere", "global",
+    "emea", "distributed",
+    "remote worldwide", "work from anywhere",
+    "anywhere in the world",
 ]
 
 seen_jobs = set()
@@ -92,13 +101,16 @@ def is_good_job(title, location, description=""):
     loc_low = location.lower()
     desc_low = description.lower()
     full = title_low + " " + loc_low + " " + desc_low
+
     if not any(k in title_low for k in ROLE_KEYWORDS):
         return False
     if any(b in title_low for b in LEVEL_BLOCK):
         return False
     if any(s in full for s in STOP_WORDS):
         return False
-    if loc_low and not any(r in loc_low for r in REMOTE_OK_WORDS):
+    if any(g in loc_low for g in GEO_RESTRICTED):
+        return False
+    if not any(r in loc_low for r in REMOTE_OK_WORDS):
         return False
     return True
 
@@ -111,7 +123,7 @@ def fetch_greenhouse(company, url):
         results.append({
             "id": str(j["id"]),
             "title": j.get("title", ""),
-            "location": j.get("location", {}).get("name", "Remote"),
+            "location": j.get("location", {}).get("name", ""),
             "link": j.get("absolute_url", ""),
             "description": ""
         })
@@ -129,7 +141,7 @@ def fetch_lever(company, url):
         results.append({
             "id": str(j.get("id", "")),
             "title": j.get("text", ""),
-            "location": j.get("categories", {}).get("location", "Remote"),
+            "location": j.get("categories", {}).get("location", ""),
             "link": j.get("hostedUrl", ""),
             "description": desc
         })
@@ -150,7 +162,7 @@ def fetch_remoteok():
                     "id": str(job["id"]),
                     "company": job.get("company", "Unknown"),
                     "title": job.get("position", ""),
-                    "location": job.get("location", "Remote"),
+                    "location": job.get("location", "Worldwide"),
                     "link": job.get("url", ""),
                     "salary": job.get("salary", ""),
                     "description": job.get("description", "")[:500]
@@ -181,7 +193,7 @@ def check_jobs():
                        f"{job['link']}\n\n"
                        f"Podavaysya v pervye 10 minut!")
                 send_telegram(msg)
-                print(f"OK {company}: {job['title']}")
+                print(f"OK {company}: {job['title']} | {job['location']}")
             time.sleep(1)
         except Exception as e:
             print(f"ERR {company}: {e}")
@@ -200,11 +212,11 @@ def check_jobs():
                    f"{job['link']}\n\n"
                    f"Podavaysya v pervye 10 minut!")
             send_telegram(msg)
-            print(f"OK RemoteOK: {job['title']}")
+            print(f"OK RemoteOK: {job['title']} @ {job['company']}")
     except Exception as e:
         print(f"ERR RemoteOK: {e}")
 
-send_telegram("PandaJobHunt v10 zapushen! 27 kompaniy + RemoteOK. Tolko Remote Worldwide. Bez US Auth.")
+send_telegram("PandaJobHunt v11. Tolko Remote Worldwide. Argentina/Brazil/US remote - zablokirovany.")
 
 while True:
     print("Proverka...")
