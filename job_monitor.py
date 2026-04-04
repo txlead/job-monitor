@@ -9,36 +9,33 @@ CHAT_ID = "737885020"
 HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
 
 SOURCES = [
+    ("Webflow", "https://boards-api.greenhouse.io/v1/boards/webflow/jobs"),
     ("Alchemy", "https://boards-api.greenhouse.io/v1/boards/alchemy/jobs"),
     ("Coinbase", "https://boards-api.greenhouse.io/v1/boards/coinbase/jobs"),
     ("Ripple", "https://boards-api.greenhouse.io/v1/boards/ripple/jobs"),
     ("Consensys", "https://boards-api.greenhouse.io/v1/boards/consensys/jobs"),
-    ("Anchorage", "https://boards-api.greenhouse.io/v1/boards/anchorage/jobs"),
-    ("Wise", "https://boards-api.greenhouse.io/v1/boards/wise/jobs"),
-    ("Brex", "https://boards-api.greenhouse.io/v1/boards/brex/jobs"),
-    ("Ramp", "https://boards-api.greenhouse.io/v1/boards/ramp/jobs"),
-    ("Mercury", "https://boards-api.greenhouse.io/v1/boards/mercury/jobs"),
     ("Stripe", "https://boards-api.greenhouse.io/v1/boards/stripe/jobs"),
-    ("Webflow", "https://boards-api.greenhouse.io/v1/boards/webflow/jobs"),
     ("Airtable", "https://boards-api.greenhouse.io/v1/boards/airtable/jobs"),
     ("Anthropic", "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs"),
     ("Figma", "https://boards-api.greenhouse.io/v1/boards/figma/jobs"),
     ("Gitlab", "https://boards-api.greenhouse.io/v1/boards/gitlab/jobs"),
     ("Messari", "https://boards-api.greenhouse.io/v1/boards/messari/jobs"),
+    ("Brex", "https://boards-api.greenhouse.io/v1/boards/brex/jobs"),
+    ("Mercury", "https://boards-api.greenhouse.io/v1/boards/mercury/jobs"),
     ("Kraken", "https://api.lever.co/v0/postings/kraken"),
     ("Ledger", "https://api.lever.co/v0/postings/ledger"),
-    ("Bitpanda", "https://api.lever.co/v0/postings/bitpanda"),
     ("Revolut", "https://api.lever.co/v0/postings/revolut"),
     ("Klarna", "https://api.lever.co/v0/postings/klarna"),
     ("Vercel", "https://api.lever.co/v0/postings/vercel"),
-    ("Doist", "https://api.lever.co/v0/postings/doist"),
-    ("Hotjar", "https://api.lever.co/v0/postings/hotjar"),
     ("Framer", "https://api.lever.co/v0/postings/framer"),
-    ("Buffer", "https://api.lever.co/v0/postings/buffer"),
     ("Monzo", "https://api.lever.co/v0/postings/monzo"),
     ("Chainalysis", "https://api.lever.co/v0/postings/chainalysis"),
     ("Circle", "https://api.lever.co/v0/postings/circle"),
     ("Fireblocks", "https://api.lever.co/v0/postings/fireblocks"),
+    ("Hotjar", "https://api.lever.co/v0/postings/hotjar"),
+    ("Doist", "https://api.lever.co/v0/postings/doist"),
+    ("Buffer", "https://api.lever.co/v0/postings/buffer"),
+    ("Bitpanda", "https://api.lever.co/v0/postings/bitpanda"),
 ]
 
 REMOTEOK_TAGS = ["brand-design", "graphic-design"]
@@ -68,8 +65,7 @@ STOP_WORDS = [
     "must reside in", "must live in", "unpaid", "volunteer",
     "must be based in", "permanently authorized",
     "within the united states", "within the us",
-    "within canada", "within the uk",
-    "remote within",
+    "within canada", "within the uk", "remote within",
 ]
 
 REMOTE_OK_WORDS = [
@@ -208,7 +204,7 @@ def check_jobs():
     except Exception as e:
         print(f"ERR RemoteOK: {e}")
 
-send_telegram("PandaJobHunt v9 zapushen! 30 kompaniy + RemoteOK. Tolko Remote Worldwide. Bez US Auth.")
+send_telegram("PandaJobHunt v10 zapushen! 27 kompaniy + RemoteOK. Tolko Remote Worldwide. Bez US Auth.")
 
 while True:
     print("Proverka...")
