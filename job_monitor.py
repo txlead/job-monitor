@@ -9,27 +9,35 @@ CHAT_ID = "737885020"
 HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
 
 SOURCES = [
-    ("Webflow", "https://boards-api.greenhouse.io/v1/boards/webflow/jobs"),
+    # Крипто - Greenhouse (проверено)
     ("Alchemy", "https://boards-api.greenhouse.io/v1/boards/alchemy/jobs"),
     ("Coinbase", "https://boards-api.greenhouse.io/v1/boards/coinbase/jobs"),
     ("Ripple", "https://boards-api.greenhouse.io/v1/boards/ripple/jobs"),
     ("Consensys", "https://boards-api.greenhouse.io/v1/boards/consensys/jobs"),
-    ("Stripe", "https://boards-api.greenhouse.io/v1/boards/stripe/jobs"),
-    ("Airtable", "https://boards-api.greenhouse.io/v1/boards/airtable/jobs"),
-    ("Anthropic", "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs"),
-    ("Figma", "https://boards-api.greenhouse.io/v1/boards/figma/jobs"),
-    ("Gitlab", "https://boards-api.greenhouse.io/v1/boards/gitlab/jobs"),
     ("Messari", "https://boards-api.greenhouse.io/v1/boards/messari/jobs"),
+    ("Gemini", "https://boards-api.greenhouse.io/v1/boards/gemini/jobs"),
+    ("Blockchain", "https://boards-api.greenhouse.io/v1/boards/blockchain/jobs"),
+    ("Brave", "https://boards-api.greenhouse.io/v1/boards/brave/jobs"),
+    ("Nansen", "https://boards-api.greenhouse.io/v1/boards/nansen/jobs"),
+    ("Bitso", "https://boards-api.greenhouse.io/v1/boards/bitso/jobs"),
+    # Финтех - Greenhouse (проверено)
     ("Brex", "https://boards-api.greenhouse.io/v1/boards/brex/jobs"),
     ("Mercury", "https://boards-api.greenhouse.io/v1/boards/mercury/jobs"),
+    ("Airtable", "https://boards-api.greenhouse.io/v1/boards/airtable/jobs"),
+    ("Anthropic", "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs"),
+    ("Gitlab", "https://boards-api.greenhouse.io/v1/boards/gitlab/jobs"),
+    ("Adyen", "https://boards-api.greenhouse.io/v1/boards/adyen/jobs"),
+    ("Monzo", "https://boards-api.greenhouse.io/v1/boards/monzo/jobs"),
+    ("Pleo", "https://boards-api.greenhouse.io/v1/boards/pleo/jobs"),
+    ("N26", "https://boards-api.greenhouse.io/v1/boards/n26/jobs"),
+    # Крипто - Lever (проверено)
     ("Kraken", "https://api.lever.co/v0/postings/kraken"),
     ("Ledger", "https://api.lever.co/v0/postings/ledger"),
-    ("Revolut", "https://api.lever.co/v0/postings/revolut"),
-    ("Klarna", "https://api.lever.co/v0/postings/klarna"),
-    ("Framer", "https://api.lever.co/v0/postings/framer"),
-    ("Chainalysis", "https://api.lever.co/v0/postings/chainalysis"),
-    ("Circle", "https://api.lever.co/v0/postings/circle"),
-    ("Fireblocks", "https://api.lever.co/v0/postings/fireblocks"),
+    ("Moonpay", "https://api.lever.co/v0/postings/moonpay"),
+    ("Zerion", "https://api.lever.co/v0/postings/zerion"),
+    # Финтех/Remote - Lever (проверено)
+    ("Spendesk", "https://api.lever.co/v0/postings/spendesk"),
+    ("Whereby", "https://api.lever.co/v0/postings/whereby"),
 ]
 
 REMOTEOK_TAGS = ["brand-design", "graphic-design"]
@@ -60,8 +68,6 @@ STOP_WORDS = [
     "must be based in", "permanently authorized",
     "within the united states", "within the us",
     "within canada", "within the uk", "remote within",
-    "not contractor", "not a contractor",
-    "employees only", "full-time only",
 ]
 
 GEO_RESTRICTED = [
@@ -79,7 +85,6 @@ REMOTE_OK_WORDS = [
     "worldwide", "anywhere", "global",
     "emea", "distributed",
     "remote worldwide", "work from anywhere",
-    "anywhere in the world",
 ]
 
 seen_jobs = set()
@@ -101,7 +106,6 @@ def is_good_job(title, location, description=""):
     loc_low = location.lower()
     desc_low = description.lower()
     full = title_low + " " + loc_low + " " + desc_low
-
     if not any(k in title_low for k in ROLE_KEYWORDS):
         return False
     if any(b in title_low for b in LEVEL_BLOCK):
@@ -216,7 +220,7 @@ def check_jobs():
     except Exception as e:
         print(f"ERR RemoteOK: {e}")
 
-send_telegram("PandaJobHunt v11. Tolko Remote Worldwide. Argentina/Brazil/US remote - zablokirovany.")
+send_telegram("PandaJobHunt v14. 25 proverennykh kompaniy + RemoteOK. Tolko Remote Worldwide.")
 
 while True:
     print("Proverka...")
