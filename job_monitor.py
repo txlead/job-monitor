@@ -10,10 +10,6 @@ HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleW
 
 SOURCES = [
     ("Alchemy", "https://boards-api.greenhouse.io/v1/boards/alchemy/jobs"),
-    ("Uniswap", "https://boards-api.greenhouse.io/v1/boards/uniswap/jobs"),
-    ("Optimism", "https://boards-api.greenhouse.io/v1/boards/optimism/jobs"),
-    ("MagicEden", "https://boards-api.greenhouse.io/v1/boards/magiceden/jobs"),
-    ("Messari", "https://boards-api.greenhouse.io/v1/boards/messari/jobs"),
     ("Coinbase", "https://boards-api.greenhouse.io/v1/boards/coinbase/jobs"),
     ("Ripple", "https://boards-api.greenhouse.io/v1/boards/ripple/jobs"),
     ("Consensys", "https://boards-api.greenhouse.io/v1/boards/consensys/jobs"),
@@ -22,33 +18,27 @@ SOURCES = [
     ("Brex", "https://boards-api.greenhouse.io/v1/boards/brex/jobs"),
     ("Ramp", "https://boards-api.greenhouse.io/v1/boards/ramp/jobs"),
     ("Mercury", "https://boards-api.greenhouse.io/v1/boards/mercury/jobs"),
-    ("Deel", "https://boards-api.greenhouse.io/v1/boards/deel/jobs"),
     ("Stripe", "https://boards-api.greenhouse.io/v1/boards/stripe/jobs"),
-    ("Notion", "https://boards-api.greenhouse.io/v1/boards/notion/jobs"),
-    ("Loom", "https://boards-api.greenhouse.io/v1/boards/loom/jobs"),
     ("Webflow", "https://boards-api.greenhouse.io/v1/boards/webflow/jobs"),
     ("Airtable", "https://boards-api.greenhouse.io/v1/boards/airtable/jobs"),
     ("Anthropic", "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs"),
-    ("Retool", "https://boards-api.greenhouse.io/v1/boards/retool/jobs"),
-    ("Canva", "https://boards-api.greenhouse.io/v1/boards/canva/jobs"),
     ("Figma", "https://boards-api.greenhouse.io/v1/boards/figma/jobs"),
-    ("Miro", "https://boards-api.greenhouse.io/v1/boards/miro/jobs"),
     ("Gitlab", "https://boards-api.greenhouse.io/v1/boards/gitlab/jobs"),
-    ("Zapier", "https://boards-api.greenhouse.io/v1/boards/zapier/jobs"),
+    ("Messari", "https://boards-api.greenhouse.io/v1/boards/messari/jobs"),
     ("Kraken", "https://api.lever.co/v0/postings/kraken"),
-    ("Chainalysis", "https://api.lever.co/v0/postings/chainalysis"),
     ("Ledger", "https://api.lever.co/v0/postings/ledger"),
     ("Bitpanda", "https://api.lever.co/v0/postings/bitpanda"),
-    ("Circle", "https://api.lever.co/v0/postings/circle"),
-    ("Fireblocks", "https://api.lever.co/v0/postings/fireblocks"),
-    ("Monzo", "https://api.lever.co/v0/postings/monzo"),
     ("Revolut", "https://api.lever.co/v0/postings/revolut"),
     ("Klarna", "https://api.lever.co/v0/postings/klarna"),
-    ("Framer", "https://api.lever.co/v0/postings/framer"),
     ("Vercel", "https://api.lever.co/v0/postings/vercel"),
-    ("Buffer", "https://api.lever.co/v0/postings/buffer"),
     ("Doist", "https://api.lever.co/v0/postings/doist"),
     ("Hotjar", "https://api.lever.co/v0/postings/hotjar"),
+    ("Framer", "https://api.lever.co/v0/postings/framer"),
+    ("Buffer", "https://api.lever.co/v0/postings/buffer"),
+    ("Monzo", "https://api.lever.co/v0/postings/monzo"),
+    ("Chainalysis", "https://api.lever.co/v0/postings/chainalysis"),
+    ("Circle", "https://api.lever.co/v0/postings/circle"),
+    ("Fireblocks", "https://api.lever.co/v0/postings/fireblocks"),
 ]
 
 REMOTEOK_TAGS = ["brand-design", "graphic-design"]
@@ -77,6 +67,9 @@ STOP_WORDS = [
     "us only", "usa only", "hybrid", "on-site", "onsite",
     "must reside in", "must live in", "unpaid", "volunteer",
     "must be based in", "permanently authorized",
+    "within the united states", "within the us",
+    "within canada", "within the uk",
+    "remote within",
 ]
 
 REMOTE_OK_WORDS = [
@@ -185,12 +178,12 @@ def check_jobs():
                 seen_jobs.add(jid)
                 if not is_good_job(job["title"], job["location"], job.get("description", "")):
                     continue
-                msg = (f"Новая вакансия!\n\n"
+                msg = (f"Novaya vakansiya!\n\n"
                        f"{company}\n"
                        f"{job['title']}\n"
                        f"{job['location']}\n"
                        f"{job['link']}\n\n"
-                       f"Подавайся в первые 10 минут!")
+                       f"Podavaysya v pervye 10 minut!")
                 send_telegram(msg)
                 print(f"OK {company}: {job['title']}")
             time.sleep(1)
@@ -209,13 +202,13 @@ def check_jobs():
                    f"{job['title']}\n"
                    f"{job['location']}\n"
                    f"{job['link']}\n\n"
-                   f"Подавайся в первые 10 минут!")
+                   f"Podavaysya v pervye 10 minut!")
             send_telegram(msg)
             print(f"OK RemoteOK: {job['title']}")
     except Exception as e:
         print(f"ERR RemoteOK: {e}")
 
-send_telegram("PandaJobHunt v8 zapushen! 40 kompaniy + RemoteOK. Filtry: Brand/Graphic/Visual/Art Director. Tolko Remote.")
+send_telegram("PandaJobHunt v9 zapushen! 30 kompaniy + RemoteOK. Tolko Remote Worldwide. Bez US Auth.")
 
 while True:
     print("Proverka...")
